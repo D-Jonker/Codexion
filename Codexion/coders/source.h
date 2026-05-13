@@ -6,7 +6,7 @@
 /*   By: dijonker <dijonker@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/04/24 10:06:43 by dijonker          #+#    #+#             */
-/*   Updated: 2026/04/24 11:23:04 by dijonker         ###   ########.fr       */
+/*   Updated: 2026/05/12 11:21:01 by dijonker         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,24 +18,45 @@
 # include <stdlib.h>
 # include <string.h>
 # include <sys/time.h>
-# include "coders.h"
 # include "dongles.h"
-# include "monotoring.h"
+# include "coders.h"
+# include "system.h"
 
-char		*ft_strdup(const char *s);
+int				codexion(t_system *system);
 
-void		free_for_all(t_monotoring *data);
+pthread_mutex_t	*mutex_init(void);
 
-int			codexion(t_monotoring *data);
+size_t			get_time(void);
 
-t_dongle	**create_dongles(t_monotoring *data);
-int			destroy_dongles(t_dongle **dongles, int dongle_count);
+int				monotoring_init(t_system *system);
+void			*monotoring(void *system);
 
-t_coder		**create_coders(t_monotoring *data);
-int			join_coders(t_coder **coders, int coder_count);
+int				create_dongles(t_system *system);
+void			get_dongles(t_coder *coder);
+void			get_dongles_edf(t_coder *coder);
+void			get_dongles_fifo(t_coder *coder);
+void			release(t_coder *coder, t_dongle *dongle);
 
-void		*compilation_stage(int current_time, int coder_id, int sleep_time);
-void		*debugging_stage(int current_time, int coder_id, int sleep_time);
-void		*refactoring_stage(int current_time, int coder_id, int sleep_time);
+/**
+ * @brief Allocates and innitialises a array of coders
+ * 
+ * @param system (t_system) is a struct with the base information of the program
+ * 
+ * @return t_coder** an array of t_coder with memory allocated to start a
+ * 		   thread lather
+ */
+int				create_coders(t_system *system);
+int				launch_coders(t_system *system);
+int				join_coders(t_system *system);
+
+void			compilation_stage(t_coder *coder);
+void			debugging_stage(t_coder *coder);
+void			refactoring_stage(t_coder *coder);
+void			burnout_stage(t_coder *coder);
+
+int				free_for_all(t_system *system, int mode);
+
+int				has_stopped(t_coder *coder);
+int				should_release(t_coder *coder);
 
 #endif

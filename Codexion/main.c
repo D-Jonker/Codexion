@@ -6,46 +6,37 @@
 /*   By: dijonker <dijonker@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/04/24 12:20:10 by dijonker          #+#    #+#             */
-/*   Updated: 2026/04/24 14:45:09 by dijonker         ###   ########.fr       */
+/*   Updated: 2026/05/04 10:45:52 by dijonker         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "coders/source.h"
 
-static t_monotoring	*monotoring_init(void);
-
-static t_monotoring	*monotoring_init(void)
+int	main(int argc, char **argv)
 {
-	t_monotoring	*data;
+	t_system	*system;
 
-	data = malloc(sizeof(t_monotoring));
-	if (!data)
-		return (NULL);
-	data->nbr_dongles_created = 0;
-	data->nbr_coders_created = 0;
-	data->nbr_of_coders_launched = 0;
-	data->nbr_of_coders = 9;
-	data->needed_compilations = 111;
-	data->time_to_burnout = 21;
-	data->time_to_compile = 5;
-	data->time_to_debug = 5;
-	data->time_to_refactor = 5;
-	data->time_to_cooldown = 5;
-	data->scheduler = ft_strdup("Fifo");
-	return (data);
-}
-
-int	main(void)
-{
-	t_monotoring	*data;
-	int				error;
-
-	data = monotoring_init();
-	if (!data || !data->scheduler)
+	if (argc != 9 || !argv || !*argv)
+		return (write(2, "Provide all arguments\n", 24), 0);
+	if (strcmp(argv[8], "fifo") != 0 && strcmp(argv[8], "edf") != 0)
+		return (write(2, "Only \'fifo\' and \'edf\' allowed for schedule\n",
+				44), 0);
+	system = malloc(sizeof(t_system));
+	if (!system)
 		return (1);
-	error = codexion(data);
-	free(data);
-	if (error == 1)
-		return (1);
-	return (0);
+	system->nbr_coders = atoi(argv[1]);
+	system->time_to_burnout = atoi(argv[2]);
+	system->time_to_compile = atoi(argv[3]);
+	system->time_to_debug = atoi(argv[4]);
+	system->time_to_refactor = atoi(argv[5]);
+	system->needed_compilations = atoi(argv[6]);
+	system->time_to_cooldown = atoi(argv[7]);
+	system->schedule = argv[8];
+	system->nbr_dongles_created = 0;
+	system->nbr_coders_created = 0;
+	system->nbr_launched = 0;
+	system->coders = NULL;
+	system->dongles = NULL;
+	system->monotoring = NULL;
+	return (codexion(system));
 }

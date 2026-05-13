@@ -1,12 +1,18 @@
-CC =		cc
+CC      =	cc
 
-CFLAGS = 	-Wall -Werror -Wextra -pthread -I$(HDR_DIR) -g
+CFLAGS  = 	-Wall -Werror -Wextra -pthread -I$(ARC_DIR) -g
 
-BIN_DIR = 	./bin
+NAME     =	codexion
 
-NAME =		codexion.a
+MAIN	=	main.c
 
-EXEC =	codexion
+# INPUT   = 	200 660 200 200 200 3 60 fifo
+
+INPUT   = 	3 700 200 200 200 3 60 edf
+
+ARC_DIR = 	./archive
+
+ARCHIVE =	codexion.a
 
 HDR_DIR = 	coders
 
@@ -14,28 +20,29 @@ HEADERS =	$(HDR_DIR)/source.h $(HDR_DIR)/data.h $(HDR_DIR)/dongles.h $(HDR_DIR)/
 
 SRC_DIR = 	./src
 
-# $(SRC_DIR)/main.c
+SRC     =	$(SRC_DIR)/codexion.c $(SRC_DIR)/initialise_structs.c\
+			$(SRC_DIR)/monotoring.c $(SRC_DIR)/coders.c $(SRC_DIR)/free_for_all.c\
+			$(SRC_DIR)/utility.c $(SRC_DIR)/stages.c\
+			$(SRC_DIR)/coder_actions_edf.c $(SRC_DIR)/coder_actions_fifo.c
 
-SRC =		$(SRC_DIR)/codexion.c $(SRC_DIR)/mutex_dongles.c $(SRC_DIR)/stages.c\
-			$(SRC_DIR)/thread_monotoring.c $(SRC_DIR)/threads_coders.c \
-			$(SRC_DIR)/utility_functions.c
+OBJ_DIR = 	./objects
 
-OBJ_DIR = 	./build
+OBJ     = 	$(SRC:$(SRC_DIR)/%c=$(OBJ_DIR)/%o)
 
-OBJ = 		$(SRC:$(SRC_DIR)/%c=$(OBJ_DIR)/%o)
-
-.PHONY: all clean fclean re run debug
-
-all: $(BIN_DIR) $(OBJ_DIR) $(NAME)
+all: $(ARC_DIR) $(OBJ_DIR) $(ARCHIVE) $(NAME)
+	@ printf "\e[38;5;142m\n---===---===---===---===---===---===---\n\e[38;5;252m"
+	@ if [ -f $(ARC_DIR)/$(ARCHIVE) ]; then printf "\e[38;5;226m\t  Archive:\e[38;5;184m $(ARCHIVE)\n\e[38;5;252m"; fi
+	@ if [ -f $(NAME) ]; then printf "\e[38;5;226m\t  Binary:\e[38;5;184m  $(NAME)\n\e[38;5;252m"; fi
+	@ printf "\e[38;5;142m---===---===---===---===---===---===---\n\n\e[38;5;252m"
 
 $(NAME) : $(OBJ) | $(OBJ_DIR)
-	@ ar -rcs $(NAME) $<
-	@ mv $(NAME) $(BIN_DIR)
-	@ printf "\e[38;5;142m---===---===---===---===---===---===---\n\e[38;5;252m"
-	@ printf "\e[38;5;226m\t  Archive:\e[38;5;184m $@\n\e[38;5;252m"
-	@ printf "\e[38;5;142m---===---===---===---===---===---===---\n\e[38;5;252m"
+	@ $(CC) $(CFLAGS) $^ $(MAIN) -o $@
 
-$(BIN_DIR) :
+$(ARCHIVE) : $(OBJ) | $(OBJ_DIR)
+	@ ar -rcs $(ARCHIVE) $<
+	@ mv $(ARCHIVE) $(ARC_DIR)
+
+$(ARC_DIR) :
 	@ mkdir -p $@
 
 $(OBJ_DIR) :
@@ -50,21 +57,27 @@ clean:
 	@ printf "\e[38;5;112m  Cleaned:\e[38;5;70m $(OBJ_DIR)\n\e[38;5;252m"
 
 fclean: clean
-	@ rm -rf $(BIN_DIR)
-	@ rm -f a.out $(EXEC)
-	@ printf "\e[38;5;208m  Removed:\e[38;5;166m $(EXEC)\n\e[38;5;252m"
-	@ printf "\e[38;5;196m  Removed:\e[38;5;160m $(BIN_DIR)\n\n\e[38;5;252m"
+	@ rm -rf $(ARC_DIR)
+	@ rm -f a.out $(NAME)
+	@ printf "\e[38;5;208m  Removed:\e[38;5;166m $(NAME)\n\e[38;5;252m"
+	@ printf "\e[38;5;196m  Removed:\e[38;5;160m $(ARC_DIR)\n\n\e[38;5;252m"
 
 re: fclean all
 
-run: re $(EXEC)
-	@ printf "\e[38;5;33m\n---===---===---= Output =---===---===---\n\n\e[38;5;252m"
-	@ if [ -f $(EXEC) ]; then ./$(EXEC); fi
-	@ printf "\e[38;5;33m\n\n---===---===---===---===---===---===---\n\e[38;5;252m"
-# 	Makefile returns error the ./codexion returns a error
+run:
+	@ printf "\e[38;5;33m---===---===---= Output =---===---===---\n\n\e[38;5;252m"
+	@ if [ -f $(NAME) ]; then ./$(NAME) $(INPUT); else printf "\t    \e[38;5;116mNo binary found\n"; fi
+	@ printf "\e[38;5;33m\n---===---===---===----===---===---===---\n\e[38;5;252m"
 
-$(EXEC) : $(OBJ) | $(OBJ_DIR)
-	@ $(CC) $(CFLAGS) $^ main.c -o $@
+gdb: run
+	@ gdb $(NAME)
 
-debug: re $(EXEC)
-	@ gdb $(EXEC)
+memory:
+	@ printf "\n\t       \e[38;5;115mValgrind\n\e[38;5;252m\n"
+	@ if [ -f $(NAME) ]; then valgrind ./$(NAME) $(INPUT);else printf "\t    \e[38;5;116mNo binary found\n\n"; fi
+
+helgrind:
+	@ printf "\n\t       \e[38;5;196mHelgrind\n\e[38;5;252m\n"
+	@ if [ -f $(NAME) ]; then valgrind --tool=helgrind ./$(NAME) $(INPUT);else printf "\t    \e[38;5;116mNo binary found\n\n"; fi
+
+.PHONY: all clean fclean re run gdb memory helgrind

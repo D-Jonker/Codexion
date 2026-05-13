@@ -6,30 +6,79 @@
 /*   By: dijonker <dijonker@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/04/24 10:26:09 by dijonker          #+#    #+#             */
-/*   Updated: 2026/04/24 10:43:30 by dijonker         ###   ########.fr       */
+/*   Updated: 2026/05/08 13:58:24 by dijonker         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../coders/source.h"
 
-void	*compilation_stage(int current_time, int coder_id, int sleep_time)
+void	burnout_stage(t_coder *coder)
 {
-	printf("%d %d is compiling", current_time, coder_id);
-	usleep(sleep_time);
-	return (NULL);
+	pthread_mutex_lock(coder->output_log);
+	printf("  \e[38;5;196m%10lu %3d !!!BURNOUT!!!\e[38;5;252m\n",
+		get_time() - coder->program_start_time,
+		coder->id);
+	pthread_mutex_unlock(coder->output_log);
 }
 
-void	*debugging_stage(int current_time, int coder_id, int sleep_time)
+void	compilation_stage(t_coder *coder)
 {
-	printf("%d %d is debugging", current_time, coder_id);
-	usleep(sleep_time);
-	return (NULL);
+	size_t	time;
+
+	if (coder->dongle_count != 2)
+		return ;
+	pthread_mutex_lock(coder->coder_lock);
+	coder->loop_start_time = get_time();
+	pthread_mutex_unlock(coder->coder_lock);
+	if (has_stopped(coder) == 1)
+		return ;
+	pthread_mutex_lock(coder->output_log);
+	printf("  \e[38;5;4m%10lu %3d is compiling\n",
+		get_time() - coder->program_start_time, coder->id);
+	pthread_mutex_unlock(coder->output_log);
+	pthread_mutex_lock(coder->coder_lock);
+	time = get_time() - coder->loop_start_time + coder->time_to_burnout;
+	if (time <= (size_t)coder->time_to_compile)
+	{
+		pthread_mutex_unlock(coder->coder_lock);
+		usleep((time + 1) * 1000);
+		return ;
+	}
+	pthread_mutex_unlock(coder->coder_lock);
+	usleep(coder->time_to_compile * 1000);
+	pthread_mutex_lock(coder->coder_lock);
+	coder->compilations += 1;
+	pthread_mutex_unlock(coder->coder_lock);
 }
 
-void	*refactoring_stage(int current_time, int coder_id, int sleep_time)
+void	debugging_stage(t_coder *coder)
 {
-	printf("%d %d is refactoring", current_time, coder_id);
-	usleep(sleep_time);
-	return (NULL);
+	if (has_stopped(coder) == 1)
+		return ;
+	pthread_mutex_lock(coder->output_log);
+	printf("  \e[38;5;10m%10lu %3d is debugging\n",
+		get_time() - coder->program_start_time,
+		coder->id);
+	pthread_mutex_unlock(coder->output_log);
+	if (get_time() - coder->loop_start_time + coder->time_to_burnout < (size_t)coder->time_to_debug)
+		usleep(coder->time_to_burnout * 1000);
+	else
+		usleep(coder->time_to_debug * 1000);
 }
 
+void	refactoring_stage(t_coder *coder)
+{
+	if (has_stopped(coder) == 1)
+		return ;
+	pthread_mutex_lock(coder->output_log);
+	printf("  \e[38;5;185m%10lu %3d is refactoring\n",
+		get_time() - coder->program_start_time,
+		coder->id);
+	pthread_mutex_unlock(coder->output_log);
+	if (get_time() - coder->loop_start_time + coder->time_to_burnout
+		< (size_t)coder->time_to_refactor)
+		usleep((get_time() - coder->loop_start_time
+				+ coder->time_to_burnout) * 1000);
+	else
+		usleep((coder->time_to_refactor) * 1000);
+}
