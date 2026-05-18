@@ -6,7 +6,7 @@
 /*   By: dijonker <dijonker@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/04/24 11:20:54 by dijonker          #+#    #+#             */
-/*   Updated: 2026/05/08 10:50:03 by dijonker         ###   ########.fr       */
+/*   Updated: 2026/05/18 11:30:43 by dijonker         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,12 @@ static int	nbr_of_compilations(t_system *system)
 	return (tally);
 }
 
+/**
+ * @brief 
+ * 
+ * @param system 
+ * @return int 
+ */
 int	codexion(t_system *system)
 {
 	system->stop = 0;
@@ -41,6 +47,8 @@ int	codexion(t_system *system)
 		return (free_for_all(system, 0));
 	if (pthread_join(*system->monotoring, NULL) != 0)
 		return (free_for_all(system, 0));
-	printf("\n\t     \e[1;97mCompilations: %d\n", nbr_of_compilations(system));
+	printf("\n\t     \e[1;97mCompilations: %d/%d\n",
+		nbr_of_compilations(system),
+		system->nbr_coders * system->needed_compilations);
 	return (free_for_all(system, 0));
 }

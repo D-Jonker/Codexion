@@ -6,7 +6,7 @@
 /*   By: dijonker <dijonker@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/04/24 10:04:24 by dijonker          #+#    #+#             */
-/*   Updated: 2026/05/07 12:32:56 by dijonker         ###   ########.fr       */
+/*   Updated: 2026/05/18 11:34:16 by dijonker         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,7 @@ typedef struct s_system
 
 	char			*schedule;
 
+	pthread_t		*monotoring;
 	pthread_mutex_t	*monotoring_lock; //m
 	int				stop;
 
@@ -35,8 +36,6 @@ typedef struct s_system
 	t_coder			**coders;
 	int				nbr_coders_created;
 	int				nbr_launched;
-
-	pthread_t		*monotoring;
 
 	pthread_mutex_t	*output_log;
 	size_t			program_start_time;

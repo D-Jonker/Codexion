@@ -6,7 +6,7 @@
 /*   By: dijonker <dijonker@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/05/08 10:56:42 by dijonker          #+#    #+#             */
-/*   Updated: 2026/05/13 12:19:15 by dijonker         ###   ########.fr       */
+/*   Updated: 2026/05/15 15:10:52 by dijonker         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,6 @@ static t_dongle	*single_dongle(int count)
 	if (!dongle)
 		return (write(2, "ERROR: create_dongle malloc failed\n", 36), NULL);
 	dongle->id = count;
-	dongle->owner = 0;
 	dongle->c_lock = malloc(sizeof(pthread_cond_t));
 	if (!dongle->c_lock)
 		return (free(dongle),
@@ -60,6 +59,7 @@ int	create_dongles(t_system *system)
 		dongles[count]->cooldown_time = &system->time_to_cooldown;
 		dongles[count]->queue[0] = NULL;
 		dongles[count]->queue[1] = NULL;
+		dongles[count]->owner = 0;
 		dongles[count]->next = 0;
 		dongles[count]->c_locked = 0;
 		system->nbr_dongles_created += 1;

@@ -6,13 +6,13 @@
 /*   By: dijonker <dijonker@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/04/24 10:27:20 by dijonker          #+#    #+#             */
-/*   Updated: 2026/05/08 13:47:21 by dijonker         ###   ########.fr       */
+/*   Updated: 2026/05/18 09:19:39 by dijonker         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../coders/source.h"
 
-static int	should_continue(t_system	*system)
+static int	should_continue(t_system *system)
 {
 	int	i;
 	int	tally;
@@ -26,7 +26,7 @@ static int	should_continue(t_system	*system)
 		pthread_mutex_unlock(system->coders[i]->coder_lock);
 		i++;
 	}
-	if (tally < system->nbr_coders * system->needed_compilations)
+	if (tally >= system->nbr_coders * system->needed_compilations)
 		return (0);
 	return (1);
 }
@@ -50,17 +50,17 @@ void	*monotoring(void *sys)
 	int			i;
 
 	system = (t_system *)sys;
-	while (should_continue(system) == 0)
+	while (should_continue(system))
 	{
 		i = 0;
 		while (i < system->nbr_coders)
 		{
-			if (check_burnout(system, i) == 1)
+			if (should_continue(system) && check_burnout(system, i))
 			{
+				log_msg(system->coders[i], "!!!BURNOUT!!!", "\e[38;5;196m");
 				pthread_mutex_lock(system->monotoring_lock);
 				system->stop = 1;
 				pthread_mutex_unlock(system->monotoring_lock);
-				burnout_stage(system->coders[i]);
 				return (0);
 			}
 			i++;

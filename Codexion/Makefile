@@ -1,14 +1,14 @@
 CC      =	cc
 
-CFLAGS  = 	-Wall -Werror -Wextra -pthread -I$(ARC_DIR) -g
+CFLAGS  = 	-Wall -Werror -Wextra -pthread -I$(ARC_DIR)
 
 NAME     =	codexion
 
 MAIN	=	main.c
 
-# INPUT   = 	200 660 200 200 200 3 60 fifo
+INPUT   = 	99 610 200 200 200 1 90 fifo
 
-INPUT   = 	3 700 200 200 200 3 60 edf
+# INPUT   = 	100 480 200 200 200 1 60 edf
 
 ARC_DIR = 	./archive
 
@@ -68,9 +68,6 @@ run:
 	@ printf "\e[38;5;33m---===---===---= Output =---===---===---\n\n\e[38;5;252m"
 	@ if [ -f $(NAME) ]; then ./$(NAME) $(INPUT); else printf "\t    \e[38;5;116mNo binary found\n"; fi
 	@ printf "\e[38;5;33m\n---===---===---===----===---===---===---\n\e[38;5;252m"
-
-gdb: run
-	@ gdb $(NAME)
 
 memory:
 	@ printf "\n\t       \e[38;5;115mValgrind\n\e[38;5;252m\n"
