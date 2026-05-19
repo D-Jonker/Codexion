@@ -10,18 +10,17 @@ To solve a modified dining philosophers problem with the application of multithr
 #### EDF
 When two coders request a dongle the coder with the earlies time to burnout must own the dongle  
   
-The dongles request the dongle and fills a queue. When the queue has recieved two request the two coders,  
-time since loop start are compared and dongle ownership is assigned to coder with a earlier time. The coder with  
-a later time is assigned as the next owner of the dongle.  
-To optimise efficiency when two coders have equal time, the coder that has an even id is prioritised. This is done so that  
-a coder has a larger chance of recieving two dongles, reducin the amount of coders hoarding one dongle.  
+EDF scehduling has two queues. The first bieng the request queue. A dongle's owner can not be set when there is not two request waiting on it. After the queue is filled the loop_start_time is compared and the owner and next is assigned. When released the owner becomes the id stored in next and next is set to 0.
 
 #### FIFO
 When two coders request a dongle, the one which requested it the earliest recieve the dongle 
 
-The dongles ownership is set to the first coder who takes it. The next coder waits until the dongle is let go.  
-When a dongle is taken by a coder it takes two at a time to optimise efficiency, otherwise it takes none and waits  
-until it can take two.
+When requesting a dongle, the owner is set when either the owner or next field is set to 0 eg. ownerless. This cretes the equivalent of a queue as it dongles can only be aquired by the coder with the highest priority. When releasing the next becomes the owner and the next is reset to 0, meaning ownership can be assigned to that field.
+
+#### Optimisation
+When a coder aquires, it must ideally aquire two dongles. The reason for this is if they aquire one it is highly probable that it will form a queue where a series all wait for the left. This does not create a race condition, but it does make the code inefficient.  
+To prevent this in FIFO, the coder aquires two dongles at a time, other as the owner or the next_owner.
+To prevent it in EDF, when the loop_start_time (equivalent to time_to_burnout) is equal, the even coder id is prioritised. This is done so that there is a higher chance that coders aquire two dongles.
 
 ### Monotoring
 Monotoring is a thread that runs each 900 microseconds. This will compare the time loop start of a coder to their time to burnout.  
@@ -37,38 +36,60 @@ Drectory with all the extra source files other than main
 ---
 # Instructions
 ## Paramaters
-./codexion number_of_coders time_to_burnout time_to_compile time_to_refactor time_to_debug compilations_per_coder dongle_cooldown_time scheduler
+> ./codexion number_of_coders time_to_burnout time_to_compile time_to_refactor time_to_debug compilations_per_coder dongle_cooldown_time scheduler  
 
-**number_of_coders** - how many coders are present  
-**compilations_per_coder** - how many compilations is required from each coder  
-**time_to_burnout** - time since start of program or last compilation a coders must compile in  
-**time_to_compile** - time taken to compile  
-**time_to_refactor** - time it takes to refactor  
-**time_to_debug** - time taken to debug  
-**dongle_cooldown** - time after a dongle is set back on table it may not be used  
-**scheduler** - the priority system a coder aquires dongles  
+| ___Variable___ | ___Description___ |
+| :--- | :---: |
+| **number_of_coders** | How many coders are present |
+| **number_of_coders** | how many coders are present |
+| **compilations_per_coder** | how many compilations is required from each coder |  
+| **time_to_burnout** | time since start of program or last compilation a coders must compile in   |
+| **time_to_compile** | time taken to compile   |
+| **time_to_refactor** | time it takes to refactor   |
+| **time_to_debug** | time taken to debug   |
+| **dongle_cooldown** | time after a dongle is set back on table it may not be used  | 
+| **scheduler** | the priority system a coder aquires dongles   |
 
 ## Makefile
-#### Make all
-Creates an archive and a binary from the source files
+> **make all**  
+
+Creates an archive and a binary from the source files  
+
+---
   
-#### Make run
-Runs the program with pre-set paramaters
+> **make run**  
 
-#### Make clean
-Removes the objects directory
+Runs the program with pre-set paramaters  
 
-#### Make fclean
-Removes the object and bin directory and codexion binary
+---
 
-#### Make re
+> **make clean**  
+
+Removes the objects directory  
+
+---
+
+> **make fclean**  
+
+Removes the object and bin directory and codexion binary  
+
+---
+
+> **make re**  
+
 Removes the object and bin directory and codexion binary, then creates an archive and a binary from the source files  
 
-#### Make memory
-Validates the memory usage of the codexion binary using Valgrind
+---
 
-#### Make helgrind
-Validates threads using the Helgrind flag of Valgrind
+> ** make memory **  
+
+Validates the memory usage of the codexion binary using Valgrind  
+
+---
+
+> **make helgrind**  
+
+Validates threads using the Helgrind flag of Valgrind  
 
 ---
 # Resources
@@ -80,23 +101,7 @@ Validates threads using the Helgrind flag of Valgrind
 - [Helgrind Manual](https://valgrind.org/docs/manual/hg-manual.html)
 
 ## AI
-None ( ͡° ͜ʖ ͡°)
+None  
+( ͡° ͜ʖ ͡°)
 
 ---
-
-The README.md must include at least:
-• A “Description” section that clearly presents the project, including its goal and a
-brief overview.
-• An “Instructions” section containing any relevant information about compilation,
-installation, and/or execution.
-• A “Resources” section listing classic references related to the topic (documentation, articles, tutorials, etc.), as well as a description of how AI was used —
-specifying for which tasks and which parts of the project.
-➠ Additional sections may be required depending on the project (e.g., usage
-examples, feature list, technical choices, etc.).
-Any required additions will be explicitly listed below.
-For this project, the README.md must also include:
-• A “Blocking cases handled” section describing all the concurrency issues addressed in your solution (e.g., deadlock prevention and Coffman’s conditions, starvation prevention, cooldown handling, precise burnout detection, and log serialization).
-• A “Thread synchronization mechanisms” section explaining the specific threading primitives used in your implementation (pthread_mutex_t, pthread_cond_t,
-custom event implementation) and how they coordinate access to shared resources
-(dongles, logging, monitor state). Include examples of how race conditions are
-prevented
