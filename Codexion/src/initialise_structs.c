@@ -6,7 +6,7 @@
 /*   By: dijonker <dijonker@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/05/08 10:56:42 by dijonker          #+#    #+#             */
-/*   Updated: 2026/05/15 15:10:52 by dijonker         ###   ########.fr       */
+/*   Updated: 2026/05/20 16:03:29 by dijonker         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,6 +62,7 @@ int	create_dongles(t_system *system)
 		dongles[count]->owner = 0;
 		dongles[count]->next = 0;
 		dongles[count]->c_locked = 0;
+		dongles[count]->in_use = 0;
 		system->nbr_dongles_created += 1;
 		count++;
 	}

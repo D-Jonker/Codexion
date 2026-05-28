@@ -6,7 +6,7 @@
 /*   By: dijonker <dijonker@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/04/24 11:20:54 by dijonker          #+#    #+#             */
-/*   Updated: 2026/05/18 11:30:43 by dijonker         ###   ########.fr       */
+/*   Updated: 2026/05/22 10:11:34 by dijonker         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,12 +27,30 @@ static int	nbr_of_compilations(t_system *system)
 	return (tally);
 }
 
-/**
- * @brief 
- * 
- * @param system 
- * @return int 
- */
+int	launch_coders(t_system *system)
+{
+	int		count;
+	t_coder	**coders;
+
+	count = 0;
+	pthread_mutex_lock(system->monotoring_lock);
+	system->program_start_time = get_time();
+	pthread_mutex_unlock(system->monotoring_lock);
+	coders = system->coders;
+	while (count < system->nbr_coders)
+	{
+		pthread_mutex_lock(coders[count]->coder_lock);
+		coders[count]->program_start_time = system->program_start_time;
+		pthread_mutex_unlock(coders[count]->coder_lock);
+		if (pthread_create(coders[count]->thread, NULL,
+				&coders_thread, (void *)coders[count]) != 0)
+			return (1);
+		system->nbr_launched += 1;
+		count++;
+	}
+	return (0);
+}
+
 int	codexion(t_system *system)
 {
 	system->stop = 0;

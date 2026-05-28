@@ -2,13 +2,11 @@ CC      =	cc
 
 CFLAGS  = 	-Wall -Werror -Wextra -pthread -I$(ARC_DIR)
 
-NAME     =	codexion
+NAME    =	codexion
 
 MAIN	=	main.c
 
-INPUT   = 	99 610 200 200 200 1 90 fifo
-
-# INPUT   = 	100 480 200 200 200 1 60 edf
+INPUT   =	4 610 200 200 200 3 60 fifo
 
 ARC_DIR = 	./archive
 
@@ -35,18 +33,18 @@ all: $(ARC_DIR) $(OBJ_DIR) $(ARCHIVE) $(NAME)
 	@ if [ -f $(NAME) ]; then printf "\e[38;5;226m\t  Binary:\e[38;5;184m  $(NAME)\n\e[38;5;252m"; fi
 	@ printf "\e[38;5;142m---===---===---===---===---===---===---\n\n\e[38;5;252m"
 
-$(NAME) : $(OBJ) | $(OBJ_DIR)
-	@ $(CC) $(CFLAGS) $^ $(MAIN) -o $@
-
-$(ARCHIVE) : $(OBJ) | $(OBJ_DIR)
-	@ ar -rcs $(ARCHIVE) $<
-	@ mv $(ARCHIVE) $(ARC_DIR)
-
 $(ARC_DIR) :
 	@ mkdir -p $@
 
 $(OBJ_DIR) :
 	@ mkdir -p $@
+
+$(ARCHIVE) : $(OBJ)
+	@ ar -rcs $(ARCHIVE) $<
+	@ mv $(ARCHIVE) $(ARC_DIR)
+
+$(NAME) : $(OBJ) | $(OBJ_DIR)
+	@ $(CC) $(CFLAGS) $^ $(MAIN) -o $@
 
 $(OBJ_DIR)/%.o : $(SRC_DIR)/%.c
 	@ printf "\e[38;5;38m  Made .o:\e[38;5;245m $@\n\e[38;5;252m"
@@ -68,6 +66,8 @@ run:
 	@ printf "\e[38;5;33m---===---===---= Output =---===---===---\n\n\e[38;5;252m"
 	@ if [ -f $(NAME) ]; then ./$(NAME) $(INPUT); else printf "\t    \e[38;5;116mNo binary found\n"; fi
 	@ printf "\e[38;5;33m\n---===---===---===----===---===---===---\n\e[38;5;252m"
+
+rerun: re run
 
 memory:
 	@ printf "\n\t       \e[38;5;115mValgrind\n\e[38;5;252m\n"

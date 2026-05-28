@@ -6,7 +6,7 @@
 /*   By: dijonker <dijonker@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/04/24 12:20:10 by dijonker          #+#    #+#             */
-/*   Updated: 2026/05/18 10:19:05 by dijonker         ###   ########.fr       */
+/*   Updated: 2026/05/21 15:49:53 by dijonker         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,7 +57,7 @@ int	main(int argc, char **argv)
 		return (1);
 	assign_atoi(argv, system);
 	if (numeric_validation(system))
-		return (write(2, "Numeric arguments should be positive\n", 38), 0);
+		return (write(2, "0 < input < INT_MAX\n", 38), 0);
 	system->nbr_dongles_created = 0;
 	system->nbr_coders_created = 0;
 	system->nbr_launched = 0;

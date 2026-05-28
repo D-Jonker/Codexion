@@ -6,7 +6,7 @@
 /*   By: dijonker <dijonker@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/04/24 10:06:43 by dijonker          #+#    #+#             */
-/*   Updated: 2026/05/18 12:16:00 by dijonker         ###   ########.fr       */
+/*   Updated: 2026/05/22 10:13:00 by dijonker         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -213,6 +213,15 @@ int				create_coders(t_system *system);
 int				launch_coders(t_system *system);
 
 /**
+ * @brief	Order of opperations of a coder
+ * 
+ * @param	coder_void 
+ * 			t_coder struct but casted as a void to pass to the thread
+ * @return	void* 
+ */
+void			*coders_thread(void *coder_void);
+
+/**
  * @brief 	Joins all the coder threads
  * 
  * @param	system
@@ -256,16 +265,6 @@ int				join_coders(t_system *system);
 int				free_for_all(t_system *system, int mode);
 
 /**
- * @brief	Get the dongles object
- * 			Directs the coder thread to the correct scheduler format
- * 
- * @param	coder
- * 			A pointer to a coder struct with all the attributes needed
- * 			for a coder thread.
- */
-void			get_dongles(t_coder *coder);
-
-/**
  * @brief	Get the dongles edf object
  * 			Implements edf schedule startegy
  * 
@@ -282,6 +281,18 @@ void			get_dongles_edf(t_coder *coder);
  * 			for a coder thread.
  */
 void			get_dongles_fifo(t_coder *coder);
+
+/**
+ * @brief 	Makes sur that a coder has two dongles. If combines output
+ * 			to more likely scenarios.
+ * 
+ * @param	first
+ * 			The first t_dongle a coder will take.
+ * 
+ * @param	second
+ * 			The second t_dongle a coder will take.
+ */
+void			to_get_two(t_dongle *first, t_dongle *second);
 
 /**
  * @brief 	Coder realeses a specific dongle
@@ -323,5 +334,14 @@ void			debugging_stage(t_coder *coder);
  * 			for a coder thread.
  */
 void			refactoring_stage(t_coder *coder);
+
+/**
+ * @brief 	When there is one coder
+ * 
+ * @param	coder
+ * 			A pointer to a coder struct with all the attributes needed
+ * 			for a coder thread.
+ */
+void			one_coder(t_coder *coder);
 
 #endif
