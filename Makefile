@@ -6,7 +6,29 @@ NAME    =	codexion
 
 MAIN	=	main.c
 
+# INPUT   =	1 200 60 60 60 3 60 edf
+
+# INPUT   =	1 200 60 60 60 3 60 fifo
+
+# INPUT   =	4 610 200 200 200 3 60 edf
+
 INPUT   =	4 610 200 200 200 3 60 fifo
+
+
+# INPUT   =	5 755 200 200 200 5 50 edf
+
+# INPUT   =	5 760 200 200 200 5 50 fifo
+
+
+# INPUT   =	200 850 200 200 200 3 60 edf
+
+# INPUT   =	200 850 200 200 200 3 50 fifo
+
+
+# INPUT   =	199 860 200 200 200 3 50 edf
+
+# INPUT   =	199 900 200 200 200 3 50 fifo
+
 
 ARC_DIR = 	./archive
 
